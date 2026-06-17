@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "anzdrop",
+  "compatibility_date": "2026-06-17",
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "anzdrop"
+    }
+  ],
+
+  "r2_buckets": [
+    {
+      "binding": "FILES_BUCKET",
+      "bucket_name": "anzdrop"
+    }
+  ]
+}
