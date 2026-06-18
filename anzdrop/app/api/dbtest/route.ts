@@ -1,7 +1,8 @@
 export const runtime = "edge";
 
-export async function GET() {
+export async function GET(request: Request) {
   return Response.json({
-    status: "Hello, dbTestAPI!"
+    hasCloudflareEnv:
+      typeof (request as any).cf !== "undefined",
   });
 }
