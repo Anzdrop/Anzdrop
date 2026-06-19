@@ -1,5 +1,3 @@
-export const runtime = "edge";
-
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 export async function GET() {
@@ -7,13 +5,10 @@ export async function GET() {
     const { env } = getCloudflareContext();
 
     const result = await env.DB
-      .prepare("SELECT COUNT(*) as count FROM shares")
-      .first();
+      .prepare("SELECT name FROM sqlite_master WHERE type='table'")
+      .all();
 
-    return Response.json({
-      success: true,
-      result,
-    });
+    return Response.json(result);
   } catch (error) {
     return Response.json({
       success: false,
