@@ -19,6 +19,16 @@ type RouteContext = {
   }>;
 };
 
+type DownloadResponseFile = {
+  id: string;
+  name: string;
+};
+
+type DownloadResponseShare = {
+  id: string;
+  expires_at: string;
+};
+
 export async function GET(
   request: Request,
   context: RouteContext
@@ -73,10 +83,20 @@ export async function GET(
       .bind(shareId)
       .all<FileRecord>();
 
+    const responseShare: DownloadResponseShare = {
+      id: share.id,
+      expires_at: share.expires_at,
+    };
+
+    const responseFiles: DownloadResponseFile[] = files.map((file) => ({
+      id: file.id,
+      name: file.encrypted_file_name,
+    }));
+
     return Response.json({
       success: true,
-      share,
-      files,
+      share: responseShare,
+      files: responseFiles,
     });
   } catch (error) {
     return Response.json(
