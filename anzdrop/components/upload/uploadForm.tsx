@@ -2,8 +2,17 @@
 
 import { useState } from "react";
 
+  type UploadResponse = {
+    success: boolean;
+    shareId?: string;
+    error?: string;
+  };
+
 export default function UploadForm() {
   const [files, setFiles] = useState<File[]>([]);
+  const [shareId, setShareId] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleFileChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -13,6 +22,48 @@ export default function UploadForm() {
     }
 
     setFiles(Array.from(event.target.files));
+  };
+
+  const upload = async () => {
+    if (files.length === 0) {
+      setError("ファイルを選択してください。");
+      return;
+    }
+
+    setError("");
+    setIsUploading(true);
+
+    try {
+      const formData = new FormData();
+
+      files.forEach((file) => {
+        formData.append("files", file);
+      });
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result: UploadResponse = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error ?? "Upload failed");
+      }
+
+      if (!result.shareId) {
+        throw new Error("shareId is missing");
+      }
+
+      setShareId(result.shareId);
+      setError("");
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Unknown error"
+      );
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -44,6 +95,29 @@ export default function UploadForm() {
           </ul>
         )}
       </div>
+      <button
+        onClick={upload}
+        disabled={isUploading}
+        className="mt-6 rounded bg-blue-600 px-4 py-2 text-white disabled:bg-gray-400"
+      >
+        {isUploading ? "アップロード中..." : "アップロード"}
+      </button>
+      {error && (
+        <p className="mt-4 text-red-600">
+          {error}
+        </p>
+      )}
+      {shareId && (
+        <div className="mt-6">
+          <h2 className="font-semibold">
+            Share ID
+          </h2>
+
+          <p className="break-all">
+            {shareId}
+          </p>
+        </div>
+      )}
     </div>
   );
 }
