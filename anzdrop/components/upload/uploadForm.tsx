@@ -2,17 +2,22 @@
 
 import { useState } from "react";
 
-  type UploadResponse = {
-    success: boolean;
-    shareId?: string;
-    error?: string;
-  };
+type UploadResponse = {
+  success: boolean;
+  shareId?: string;
+  error?: string;
+};
 
 export default function UploadForm() {
   const [files, setFiles] = useState<File[]>([]);
   const [shareId, setShareId] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState("");
+
+  const shareUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/d/${shareId}`
+      : "";
 
   const handleFileChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -110,11 +115,11 @@ export default function UploadForm() {
       {shareId && (
         <div className="mt-6">
           <h2 className="font-semibold">
-            Share ID
+            共有URL
           </h2>
 
           <p className="break-all">
-            {shareId}
+            {shareUrl}
           </p>
         </div>
       )}
